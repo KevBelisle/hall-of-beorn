@@ -53,6 +53,10 @@ namespace HallOfBeorn.Models.LotR.Sets.FirstAge
                 .WithOppositeTextLine("During quest resolution, progress tokens are placed first on the active enemy, then the active location, and finally on the quest stage. If a number of progress tokens equal to the active enemy's threat is placed on it, that enemy is discarded.")
                 .WithTextLine("Whenever an amount of progress is placed on the active enemy, the first player must pass a Sneak test. The first player may discard any number of cards from their hand, adding up the costs of those cards. Then, the top card of the encounter deck is discarded. Compare the cost of the discarded player cards against the threat value of the discarded encounter card. If the cost is greater than or equal to the threat value, then the Sneak attempt passes. If the cost is less than the threat value, the the Sneak attempt fails. If a Sneak attempt fails, the active enemy immediately engages the first player. Progress that was placed on the active location or quest is not affected. When engaged with an enemy with the Sneak keyword, players may cancel all progress and instead place an equivalent number of damage tokens on enemies with the Sneak keyword instead.")
                 .WithInfo(0, 1, Artist.Unknown);
+            addHero("Beren", 8, Sphere.Leadership, 3, 2, 1, 4)
+                .WithTraits("Edain.", "House of Bëor.", "Noble.")
+                .WithTextLine("While Beren is committed to the quest, he gains: 'Response: After an encounter card with at least 3 Threat is revealed from the encounter deck, add 1 resource to Beren's resource pool.'")
+                .WithInfo(1, 3, Artist.Anke_Eissmann);
             addHero("Finrod Felagund", 10, Sphere.Leadership, 3, 3, 1, 4)
                 .WithTraits("Noldor.", "House of Finarfin.", "Noble.")
                 .WithTextLine("While Finrod Felagund is in play, each Edain character gets +1 Willpower.")
@@ -444,10 +448,6 @@ namespace HallOfBeorn.Models.LotR.Sets.FirstAge
                 .WithTraits("Oath.")
                 .WithTextLine("Action: Each character with an attached Oath gets +1 Willpower, +1 Attack, and +1 Defense until the end of the round.")
                 .WithInfo(87, 3, Artist.Ted_Nasmith);
-            addHero("Beren", 8, Sphere.Leadership, 3, 2, 1, 4)
-                .WithTraits("Edain.", "House of Bëor.", "Noble.")
-                .WithTextLine("While Beren is committed to the quest, he gains: 'Response: After an encounter card with at least 3 Threat is revealed from the encounter deck, add 1 resource to Beren's resource pool.'")
-                .WithInfo(87, 3, Artist.Anke_Eissmann);
             addEvent("Manwë's Pity", 0, Sphere.Leadership)
                 .WithTraits("Vala.")
                 .WithTextLine("Response: After a unique Noldor ally you control is destroyed by an enemy attack, immediately put into play another copy of that ally from your hand.")
