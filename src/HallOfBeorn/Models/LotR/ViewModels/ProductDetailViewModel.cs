@@ -13,16 +13,41 @@ namespace HallOfBeorn.Models.LotR.ViewModels
             Func<string, IEnumerable<EncounterCategory>> getEncounterCategories, 
             Func<string, IEnumerable<QuestCategory>> getQuestCategories,
             Func<string, IEnumerable<Region>> getRegions,
-            Func<string, IEnumerable<Archetype>> getArchetypes)
+            Func<string, IEnumerable<Archetype>> getArchetypes,
+            Language? lang,
+            Func<string, string> translateTitle,
+            Func<CardType, string> translateCardType)
         {
             this.product = product;
+            this.lang = lang;
+            this.translateTitle = translateTitle;
+            this.translateCardType = translateCardType;
+
+            this.Name = product.Name;
+
+            if (lang.GetValueOrDefault(Language.EN) != Language.EN)
+            {
+                this.Name = translateTitle(product.Name);
+            }
 
             foreach (var cardSet in product.CardSets)
             {
                 foreach (var card in cardSet.Cards.OrderBy(x => x.CardNumber))
                 {
-                    cardViewModels.Add(new CardViewModel(card, 
-                        getPlayerCategories, getEncounterCategories, getQuestCategories, getRegions, getArchetypes, null));
+                    var viewModel = new CardViewModel(card,
+                        getPlayerCategories, getEncounterCategories, getQuestCategories, getRegions, getArchetypes, lang);
+
+                    if (lang.HasValue) 
+                    {
+                        viewModel.SetTranslatedTitle(lang.Value, translateTitle(card.Title));
+                        viewModel.CardTypeName = translateCardType(card.CardType);
+                    }
+                    else 
+                    {
+                        viewModel.CardTypeName = card.CardType.ToCardTypeDescription();
+                    }
+
+                    cardViewModels.Add(viewModel);
                 }
             }
 
@@ -49,10 +74,14 @@ namespace HallOfBeorn.Models.LotR.ViewModels
         private readonly Product product;
         private readonly List<CardViewModel> cardViewModels = new List<CardViewModel>();
         private readonly string searchUrl;
+        private readonly Language? lang;
+        private readonly Func<string, string> translateTitle;
+        private readonly Func<CardType, string> translateCardType;
 
         public string Name
         {
-            get { return product.Name; }
+            get;
+            private set;
         }
 
         public string Code
@@ -147,6 +176,11 @@ namespace HallOfBeorn.Models.LotR.ViewModels
             get { return cardViewModels; }
         }
 
+        public string Lang
+        {
+            get { return lang.GetValueOrDefault(Language.EN).ToString(); }
+        }
+
         public IEnumerable<CardQuantityViewModel> CardQuantities()
         {
             var playerCardCount = 0;
@@ -158,7 +192,7 @@ namespace HallOfBeorn.Models.LotR.ViewModels
                 }
 
                 playerCardCount += pc.Card.Quantity;
-                yield return new CardQuantityViewModel(pc.Title, pc.Card.Quantity, pc.CardType, pc.Url);
+                yield return new CardQuantityViewModel(pc.Title, pc.Card.Quantity, pc.CardTypeName, pc.Url);
             }
 
             if (playerCardCount > 0)
@@ -175,7 +209,7 @@ namespace HallOfBeorn.Models.LotR.ViewModels
                 }
 
                 encounterCardCount += ec.Card.Quantity;
-                yield return new CardQuantityViewModel(ec.Title, ec.Card.Quantity, ec.CardType, ec.Url);
+                yield return new CardQuantityViewModel(ec.Title, ec.Card.Quantity, ec.CardTypeName, ec.Url);
             }
 
             if (encounterCardCount > 0)
@@ -192,7 +226,7 @@ namespace HallOfBeorn.Models.LotR.ViewModels
                 }
 
                 questCardCount += qc.Card.Quantity;
-                yield return new CardQuantityViewModel(qc.Title, qc.Card.Quantity, qc.CardType, qc.Url);
+                yield return new CardQuantityViewModel(qc.Title, qc.Card.Quantity, qc.CardTypeName, qc.Url);
             }
 
             if (questCardCount > 0)
@@ -205,7 +239,7 @@ namespace HallOfBeorn.Models.LotR.ViewModels
                 c => !c.CardType.IsPlayerCard() && !c.CardType.IsEncounterCard() && !c.CardType.IsQuestCard()))
             {
                 otherCardCount += oc.Card.Quantity;
-                yield return new CardQuantityViewModel(oc.Title, oc.Card.Quantity, oc.CardType, oc.Url);
+                yield return new CardQuantityViewModel(oc.Title, oc.Card.Quantity, oc.CardTypeName, oc.Url);
             }
 
             if (otherCardCount > 0)
@@ -219,7 +253,7 @@ namespace HallOfBeorn.Models.LotR.ViewModels
 
         public IEnumerable<ScenarioViewModel> Scenarios()
         {
-            return product.Scenarios().Select(sc => new ScenarioViewModel(sc, null, null, null, null, null, null));
+            return product.Scenarios().Select(sc => new ScenarioViewModel(sc, null, null, null, null, null, null, translateTitle));
         }
     }
 }
